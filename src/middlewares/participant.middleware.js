@@ -50,7 +50,7 @@ const userAlredyPosted = (req, res, next) => {
     const conversationId = req.params.conversationId
     findParticipantbyUserId(userId, conversationId)
         .then(data => {
-            if (data.userId === userId) {
+            if (data) {
                 res.status(400).json({ message: 'this partcipant is already created' })
             }
             else {

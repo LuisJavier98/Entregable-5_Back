@@ -195,7 +195,7 @@ const deleteConversation = (req, res) => {
     userControllers.deleteConversation(id)
         .then((data) => {
             if (data) {
-                res.status(204).json()
+                res.status(204).json({ message: 'The conversation was deleted correctly' })
             } else {
                 res.status(404).json({ message: `User with id:${id}, Not Found` })
             }
@@ -210,7 +210,7 @@ const deleteMessage = (req, res) => {
     const id = req.params.messageId
     userControllers.deleteMessage(id)
         .then(() => {
-            res.status(204).json()
+            res.status(204).json({ message: 'The message was deleted correctly' })
         })
         .catch((err) => {
             res.status(400).json({ message: err.message })
@@ -220,8 +220,8 @@ const deleteMessage = (req, res) => {
 const deleteParticipant = (req, res) => {
     const id = req.params.participantId
     userControllers.deleteParticipant(id)
-        .then(() => {
-            res.status(204).json()
+        .then((data) => {
+            res.status(204).json({ message: `The participant ${id} was deleted correctly` })
         })
         .catch((err) => {
             res.status(400).json({ message: err.message })

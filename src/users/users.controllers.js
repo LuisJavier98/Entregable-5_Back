@@ -132,6 +132,7 @@ const findParticipantById = async (id, conversation_Id) => {
 
         }
     })
+    return data
 }
 
 const findParticipantbyUserId = async (userId, conversation_Id) => {
@@ -188,10 +189,11 @@ const deleteParticipant = async (id) => {
     const data = Participants.destroy(
         {
             where: {
-                userId: id
+                id: id
             }
         }
     )
+    return data
 }
 
 
