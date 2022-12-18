@@ -2,124 +2,248 @@ const userControllers = require('./users.controllers')
 
 //? Get, Post
 
+
 const getAllUsers = (req, res) => {
     userControllers.findAllUsers()
         .then((data) => {
             res.status(200).json(data)
         })
         .catch((err) => {
-            res.status(400).json({message: err.message})
+            res.status(400).json({ message: err.message })
         })
 }
 
-const getUserById = (req, res) => {
-    const id = req.params.id
-    userControllers.findUserById(id)
-        .then((data) => {
-            if(data){
-                res.status(200).json(data)
-            } else {
-                res.status(404).json({message: 'Invalid ID'})
-            }
-        })
-        .catch((err) => {
-            res.status(400).json({message: err.message})
-        })
-}
-
-const getMyUser = (req, res) => {
-    const id = req.user.id 
-    userControllers.findUserById(id)
+//?Get all my conversations
+const getAllConversations = (req, res) => {
+    userControllers.findAllConversations()
         .then((data) => {
             res.status(200).json(data)
         })
         .catch((err) => {
-            res.status(400).json({message: err.message})
+            res.status(400).json({ message: err.message })
+        })
+}
+
+const getAllMessages = (req, res) => {
+    const conversationId = req.params.conversationId
+    userControllers.findAllMessages(conversationId)
+        .then((data) => {
+            res.status(200).json(data)
+        })
+        .catch((err) => {
+            res.status(400).json({ message: err.message })
+        })
+}
+
+const getAllParticipants = (req, res) => {
+    const conversationId = req.params.conversationId
+    userControllers.findAllParticipants(conversationId)
+        .then(data => {
+            if (data) {
+                res.status(200).json(data)
+            }
+            else {
+                res.status(400).json({ message: "Invalid ID" })
+            }
+
+        })
+        .catch(err => res.status(400).json({ message: err.message }))
+}
+
+const getConversationsById = (req, res) => {
+    const id = req.params.conversationId
+    userControllers.findConversationById(id)
+        .then((data) => {
+            if (data) {
+                res.status(200).json(data)
+            } else {
+                res.status(404).json({ message: 'Invalid ID' })
+            }
+        })
+        .catch((err) => {
+            res.status(400).json({ message: err.message })
+        })
+}
+const getMessageById = (req, res) => {
+    const conversation_Id = req.params.conversationId
+    const message_Id = req.params.messageId
+    userControllers.findMessageById(message_Id, conversation_Id)
+        .then((data) => {
+            if (data) {
+                res.status(200).json(data)
+            } else {
+                res.status(404).json({ message: 'Invalid ID' })
+            }
+        })
+        .catch((err) => {
+            res.status(400).json({ message: err.message })
+        })
+}
+
+const getParticipantById = (req, res) => {
+    const conversation_Id = req.params.conversationId
+    const participant_Id = req.params.participantId
+    userControllers.findParticipantById(participant_Id, conversation_Id)
+        .then((data) => {
+            if (data) {
+                res.status(200).json(data)
+            } else {
+                res.status(404).json({ message: 'Invalid ID' })
+            }
+        })
+        .catch((err) => {
+            res.status(400).json({ message: err.message })
         })
 }
 
 const postUser = (req, res) => {
-    const {firstName, lastName, email, password, gender, birthday} = req.body
-    userControllers.createUser({firstName, lastName, email, password,gender, birthday})
+    const { firstName, lastName, email, password, profile_image, phone } = req.body
+    userControllers.createUser({ firstName, lastName, email, password, profile_image, phone })
         .then((data) => {
             res.status(201).json(data)
         })
         .catch((err) => {
-            res.status(400).json({message: err.message, fields: {
-                firstName: 'String',
-                lastName: 'String',
-                email: 'example@example.com',
-                password: 'String',
-                gender: 'String',
-                birthday: 'YYYY/MM/DD'
-            }})
+            res.status(400).json({
+                message: err.message, fields: {
+                    firstName: "string",
+                    lastName: "string",
+                    email: "exmaple@example.com",
+                    password: "string",
+                    profile_image: "string",
+                    phone: "integer"
+                }
+            })
         })
 }
 
-//? Solo admins pueden ejecutarlo
-const patchUser = (req, res) => {
-    const id = req.params.id 
-    const {firstName, lastName, email, gender, birthday, role, status} = req.body
+const postConversation = (req, res) => {
+    const { title, image_url, participantId } = req.body
+    const userId = req.user.id
+    userControllers.createConversation({ title, image_url, participantId, userId })
+        .then((data) => res.status(201).json(data))
+        .catch((err) => {
+            res.status(400).json({
+                message: err.message, fields: {
+                    title: 'String',
+                    image_url: 'String',
+                    participantId: 'UUID'
+                }
+            })
+        })
+}
 
-    userControllers.updateUser(id, {firstName, lastName, email, gender, birthday, role, status})
-        .then((data) =>{
-            if(data){
-                res.status(200).json({message: `User edited succesfully with id: ${id}`})
+const postMessage = (req, res) => {
+    const conversationId = req.params.conversationId
+    const userId = req.user.id
+    const { message } = req.body
+    userControllers.createMessage({ userId, conversationId, message })
+        .then((data) => {
+            res.status(201).json(data)
+        })
+        .catch((err) => {
+            res.status(400).json({
+                message: err.message, fields: {
+                    message: 'STRING'
+                }
+            })
+        })
+}
+
+const postParticipant = (req, res) => {
+    const conversationId = req.params.conversationId
+    const { userId } = req.body
+    userControllers.createParticipant({ conversationId, userId })
+        .then(data => {
+            res.status(200).json({ message: `Participant created in the conversation ${conversationId}` })
+        })
+        .catch(err => res.status(400).json({
+            message: err.message, fields: {
+                userId: 'UserId'
+            }
+        }))
+}
+
+
+
+//? Solo admins pueden ejecutarlo
+const patchConversations = (req, res) => {
+    const id = req.params.conversationId
+    const { title, image_url } = req.body
+
+    userControllers.updateConversation(id, { title, image_url })
+        .then((data) => {
+            if (data) {
+                res.status(200).json({ message: `User edited succesfully with id: ${id}` })
             } else {
-                res.status(404).json({message: `User with id: ${id}, not found`})
+                res.status(404).json({ message: `User with id: ${id}, not found` })
             }
         })
         .catch((err) => {
-            res.status(400).json({message: err.message})
+            res.status(400).json({
+                message: err.message, fields: {
+                    title: 'string',
+                    image_url: 'string'
+                }
+            })
         })
 }
 
-const patchMyUser = (req, res) => {
-    const id = req.user.id
-    const { firstName, lastName, gender, birthday } = req.body
-    userControllers.updateUser(id, {firstName, lastName, gender, birthday})
-        .then(() => {
-            res.status(200).json({message: 'Your user was edited succesfully!'})
-        })
-        .catch((err) => {
-            res.status(400).json({message: err.message})
-        })
-}
 
 //? Solo admins pueden ejecutarlo
-const deleteUser = (req, res) => {
-    const id = req.params.id 
-    userControllers.deleteUser(id)
+const deleteConversation = (req, res) => {
+    const id = req.params.conversationId
+    userControllers.deleteConversation(id)
         .then((data) => {
-            if(data){
+            if (data) {
                 res.status(204).json()
             } else {
-                res.status(404).json({message: `User with id:${id}, Not Found`})
+                res.status(404).json({ message: `User with id:${id}, Not Found` })
             }
         })
         .catch((err) => {
-            res.status(400).json({message: err.message})
+            res.status(400).json({ message: err.message })
         })
 }
 
-const deleteMyUser = (req, res) => {
-    const id = req.user.id 
-    userControllers.deleteUser(id)
+
+const deleteMessage = (req, res) => {
+    const id = req.params.messageId
+    userControllers.deleteMessage(id)
         .then(() => {
             res.status(204).json()
         })
         .catch((err) => {
-            res.status(400).json({message: err.message})
+            res.status(400).json({ message: err.message })
         })
 }
 
-module.exports= {
+const deleteParticipant = (req, res) => {
+    const id = req.params.participantId
+    userControllers.deleteParticipant(id)
+        .then(() => {
+            res.status(204).json()
+        })
+        .catch((err) => {
+            res.status(400).json({ message: err.message })
+        })
+}
+
+
+
+module.exports = {
     getAllUsers,
-    getMyUser,
-    getUserById,
+    getAllConversations,
+    getAllMessages,
+    getConversationsById,
+    getMessageById,
+    getParticipantById,
+    getAllParticipants,
     postUser,
-    patchMyUser,
-    patchUser,
-    deleteMyUser,
-    deleteUser
+    postConversation,
+    postMessage,
+    postParticipant,
+    patchConversations,
+    deleteConversation,
+    deleteMessage,
+    deleteParticipant
 }

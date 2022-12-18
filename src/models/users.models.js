@@ -1,8 +1,8 @@
-const {DataTypes} = require('sequelize')
+const { DataTypes } = require('sequelize')
 
 const db = require('../utils/database')
 
-const Users = db.define('users' ,{
+const Users = db.define('users', {
     id: {
         type: DataTypes.UUID,
         primaryKey: true
@@ -18,11 +18,11 @@ const Users = db.define('users' ,{
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
-            len : [2, 50]
+            len: [2, 50]
         }
     },
     email: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING ,
         allowNull: false,
         validate: {
             isEmail: true
@@ -33,24 +33,15 @@ const Users = db.define('users' ,{
         type: DataTypes.STRING,
         allowNull: false,
     },
-    gender: {
+
+    profile_image: {
         type: DataTypes.STRING,
     },
-    birthday: {
-        type: DataTypes.DATEONLY,
-        allowNull: false
-    },
-    role: {
-        type: DataTypes.STRING,
-        defaultValue: 'normal'
-    },
-    status: {
-        type: DataTypes.STRING,
-        defaultValue: 'active'
-    },
-    isVerified: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false
+    
+    phone: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        unique: true,
     }
 })
 

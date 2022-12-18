@@ -2,22 +2,39 @@ const router = require('express').Router()
 
 const userServices = require('./users.services')
 const passportJWT = require('../middlewares/auth.middleware')
-const roleMiddleware= require('../middlewares/role.middleware')
-const { use } = require('chai')
+const { participantMiddleware, accessToYourConversation, userMiddleware, userAlredyPosted } = require('../middlewares/participant.middleware')
 
-router.route('/')
-    .get(userServices.getAllUsers)
+router.route('/user')
+    .get(passportJWT.authenticate('jwt', { session: false }), userServices.getAllUsers)
     .post(userServices.postUser)
 
-router.route('/me')
-    .get(passportJWT.authenticate('jwt', {session: false}), userServices.getMyUser)
-    .patch(passportJWT.authenticate('jwt', {session: false}), userServices.patchMyUser)
-    .delete(passportJWT.authenticate('jwt', {session: false}), userServices.deleteMyUser)
 
-router.route('/:id')
-    .get(userServices.getUserById)
-    .patch(passportJWT.authenticate('jwt', {session: false}), roleMiddleware, userServices.patchUser)
-    .delete(passportJWT.authenticate('jwt', {session: false}), roleMiddleware, userServices.deleteUser)
+router.route('/conversations')
+    .get(passportJWT.authenticate('jwt', { session: false }), userServices.getAllConversations)
+    .post(passportJWT.authenticate('jwt', { session: false }), participantMiddleware, userServices.postConversation)
 
+
+router.route('/conversations/:conversationId')
+    .get(passportJWT.authenticate('jwt', { session: false }), userServices.getConversationsById)
+    .patch(passportJWT.authenticate('jwt', { session: false }), userServices.patchConversations)
+    .delete(passportJWT.authenticate('jwt', { session: false }), userServices.deleteConversation)
+
+
+router.route('/conversations/:conversationId/participants')
+    .get(passportJWT.authenticate('jwt', { session: false }), userServices.getAllParticipants)
+    .post(passportJWT.authenticate('jwt', { session: false }), userAlredyPosted, userMiddleware, userServices.postParticipant)
+
+router.route('/conversations/:conversationId/participants/:participantId')
+    .get(passportJWT.authenticate('jwt', { session: false }), userServices.getParticipantById)
+    .delete(passportJWT.authenticate('jwt', { session: false }), userServices.deleteParticipant)
+
+router.route('/conversations/:conversationId/messages')
+    .get(passportJWT.authenticate('jwt', { session: false }), userServices.getAllMessages)
+    .post(passportJWT.authenticate('jwt', { session: false }), userServices.postMessage)
+
+
+router.route('/conversations/:conversationId/messages/:messageId')
+    .get(passportJWT.authenticate('jwt', { session: false }), userServices.getMessageById)
+    .delete(passportJWT.authenticate('jwt', { session: false }), userServices.deleteMessage)
 
 module.exports = router

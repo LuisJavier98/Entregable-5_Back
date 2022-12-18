@@ -13,7 +13,6 @@ const postLogin = (req, res) => {
                     const token = jwt.sign({
                         id: data.id,
                         email: data.email,
-                        role: data.role
                     }, jwtSecret)
 
                     res.status(200).json({

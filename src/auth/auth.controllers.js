@@ -5,12 +5,12 @@ const checkUsersCredentials = async (email, password) => {
     try {
         const user = await findUserByEmail(email)
         const verifyPassword = comparePassword(password, user.password)
-        if(verifyPassword){
+        if (verifyPassword) {
             return user
-        } 
+        }
         return null
     } catch (error) {
-        return error
+        return null
     }
 }
 
