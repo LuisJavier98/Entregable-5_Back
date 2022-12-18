@@ -1,14 +1,29 @@
 //? Previamente tiene que pasar por el middleware de autenticación
 
-const { userIdExist, findConversationById, createParticipant } = require("../users/users.controllers")
+const { findUserById, findParticipantbyUserId } = require("../users/users.controllers")
 
 
 const participantMiddleware = (req, res, next) => {
     const { participantId } = req.body
     userIdExist(participantId)
-        .then(data => next())
+        .then(data => {
+            if (data) {
+                next()
+            }
+            else {
+                res.status(400).json({
+                    message: "You can only create a conversation with an user created ", fields:
+                    {
+                        title: 'String',
+                        image_url: 'String',
+                        participantId: 'UUID'
+
+                    }
+                })
+            }
+        })
         .catch(err => res.status(400).json({
-            message: "This userId doesnt exist", fields:
+            message: "You can only create a conversation with an user created", fields:
             {
                 title: 'String',
                 image_url: 'String',
@@ -20,10 +35,10 @@ const participantMiddleware = (req, res, next) => {
 
 const userMiddleware = (req, res, next) => {
     const { userId } = req.body
-    userIdExist(userId)
+    findUserById(userId)
         .then(data => next())
         .catch(err => res.status(400).json({
-            message: "This userId doesnt exist", fields:
+            message: "Please, introduce an userId created before", fields:
             {
                 userId: 'userId',
             }
@@ -33,10 +48,10 @@ const userMiddleware = (req, res, next) => {
 const userAlredyPosted = (req, res, next) => {
     const { userId } = req.body
     const conversationId = req.params.conversationId
-    createParticipant({ userId, conversationId })
+    findParticipantbyUserId(userId, conversationId)
         .then(data => {
-            if (userId === data.userId) {
-                res.status(400).json({ message: 'User is already in the conversation ' })
+            if (data.userId === userId) {
+                res.status(400).json({ message: 'this partcipant is already created' })
             }
             else {
                 next()

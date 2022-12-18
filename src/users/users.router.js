@@ -2,7 +2,7 @@ const router = require('express').Router()
 
 const userServices = require('./users.services')
 const passportJWT = require('../middlewares/auth.middleware')
-const { participantMiddleware, accessToYourConversation, userMiddleware, userAlredyPosted } = require('../middlewares/participant.middleware')
+const { participantMiddleware, userMiddleware, userAlredyPosted } = require('../middlewares/participant.middleware')
 
 router.route('/user')
     .get(passportJWT.authenticate('jwt', { session: false }), userServices.getAllUsers)
@@ -22,7 +22,7 @@ router.route('/conversations/:conversationId')
 
 router.route('/conversations/:conversationId/participants')
     .get(passportJWT.authenticate('jwt', { session: false }), userServices.getAllParticipants)
-    .post(passportJWT.authenticate('jwt', { session: false }), userAlredyPosted, userMiddleware, userServices.postParticipant)
+    .post(passportJWT.authenticate('jwt', { session: false }), userMiddleware, userAlredyPosted, userServices.postParticipant)
 
 router.route('/conversations/:conversationId/participants/:participantId')
     .get(passportJWT.authenticate('jwt', { session: false }), userServices.getParticipantById)

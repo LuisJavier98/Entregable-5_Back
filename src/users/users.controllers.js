@@ -134,6 +134,16 @@ const findParticipantById = async (id, conversation_Id) => {
     })
 }
 
+const findParticipantbyUserId = async (userId, conversation_Id) => {
+    const data = Participants.findOne({
+        where: {
+            userId: userId,
+            conversationId: conversation_Id
+        }
+    })
+    return data
+}
+
 
 const updateConversation = async (id, obj) => {
     const data = await Conversations.update(obj, {
@@ -194,10 +204,6 @@ const findUserByEmail = async (email) => {
     return data
 }
 
-const userIdExist = async (userId) => {
-    const data = Users.findOne({ where: { id: userId } })
-    return data
-}
 
 
 module.exports = {
@@ -218,5 +224,5 @@ module.exports = {
     deleteConversation,
     deleteMessage,
     deleteParticipant,
-    userIdExist
+    findParticipantbyUserId
 }
