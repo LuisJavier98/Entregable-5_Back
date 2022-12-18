@@ -1,6 +1,6 @@
 //? Previamente tiene que pasar por el middleware de autenticación
 
-const { findUserById, findParticipantbyUserId } = require("../users/users.controllers")
+const { findUserById, findParticipantbyUserId, findAllConversations } = require("../users/users.controllers")
 
 
 const participantMiddleware = (req, res, next) => {
@@ -64,6 +64,7 @@ const userAlredyPosted = (req, res, next) => {
             }
         }))
 }
+
 
 module.exports = {
     participantMiddleware,

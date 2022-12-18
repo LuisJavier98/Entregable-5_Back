@@ -36,8 +36,12 @@ const findUserById = async (id) => {
     return data
 }
 
-const findAllConversations = async () => {
-    const data = await Conversations.findAll()
+const findAllConversations = async (id) => {
+    const data = await Conversations.findAll({
+        where: {
+            userId: id
+        }
+    })
     return data
 }
 

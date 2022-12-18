@@ -15,7 +15,8 @@ const getAllUsers = (req, res) => {
 
 //?Get all my conversations
 const getAllConversations = (req, res) => {
-    userControllers.findAllConversations()
+    id = req.user.id
+    userControllers.findAllConversations(id)
         .then((data) => {
             res.status(200).json(data)
         })
